@@ -179,7 +179,7 @@ const Home = (props: HomeProps) => {
 	
 		{wallet && (
 			<div style={{ textAlign: "center"}}>
-				<img src={frontPicture} alt="Just Pickle" width='100%' height='600px' />
+				<img src={frontPicture} alt="Just Pickle" width='60%' height='500px' />
 			</div>	 
 		)}
 		
