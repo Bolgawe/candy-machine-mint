@@ -19,13 +19,15 @@ import {
   shortenAddress,
 } from "./candy-machine";
 
+import frontPicture from './pickle.jpeg';
+
 const ConnectButton = styled(WalletDialogButton)``;
 
 const CounterText = styled.span``; // add your styles here
 
 const MintContainer = styled.div``; // add your styles here
 
-const MintButton = styled(Button)``; // add your styles here
+const MintButton = styled(Button)`fontWeight: "bold", font-size: 20px;`; // add your styles here
 
 export interface HomeProps {
   candyMachineId: anchor.web3.PublicKey;
@@ -42,7 +44,7 @@ const Home = (props: HomeProps) => {
   const [isSoldOut, setIsSoldOut] = useState(false); // true when items remaining is zero
   const [isMinting, setIsMinting] = useState(false); // true when user got to press MINT
 
-  const [itemsAvailable, setItemsAvailable] = useState(0);
+
   const [itemsRedeemed, setItemsRedeemed] = useState(0);
   const [itemsRemaining, setItemsRemaining] = useState(0);
 
@@ -51,9 +53,9 @@ const Home = (props: HomeProps) => {
     message: "",
     severity: undefined,
   });
-
+	  
   const [startDate, setStartDate] = useState(new Date(props.startDate));
-
+  
   const wallet = useAnchorWallet();
   const [candyMachine, setCandyMachine] = useState<CandyMachine>();
 
@@ -64,7 +66,6 @@ const Home = (props: HomeProps) => {
       const {
         candyMachine,
         goLiveDate,
-        itemsAvailable,
         itemsRemaining,
         itemsRedeemed,
       } = await getCandyMachineState(
@@ -73,7 +74,6 @@ const Home = (props: HomeProps) => {
         props.connection
       );
 
-      setItemsAvailable(itemsAvailable);
       setItemsRemaining(itemsRemaining);
       setItemsRedeemed(itemsRedeemed);
 
@@ -162,52 +162,85 @@ const Home = (props: HomeProps) => {
   useEffect(refreshCandyMachineState, [
     wallet,
     props.candyMachineId,
+
     props.connection,
   ]);
 
   return (
-    <main>
+	<main>  
+	<div style={{ backgroundColor: "black"}}>
+		{wallet && (
+		<div >
+			<p style={{ fontSize: 40, textAlign: "center"}}>
+				    
+			</p>
+		</div>
+		)}
+	
+		{wallet && (
+			<div style={{ textAlign: "center"}}>
+				<img src={frontPicture} alt="Just Pickle" width='100%' height='600px' />
+			</div>	 
+		)}
+		
+		
       {wallet && (
-        <p>Wallet {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
+        <p style={{ textAlign: "center"}}>
+		Wallet {shortenAddress(wallet.publicKey.toBase58() || "")}</p>
       )}
 
-      {wallet && <p>Balance: {(balance || 0).toLocaleString()} SOL</p>}
+      {wallet && (
+		    <p style={{ textAlign: "center"}}>Balance: {(balance || 0).toLocaleString()} SOL</p>
+	    )}
+     
+      {wallet && <p style={{ textAlign: "center"}}>Redeemed: {itemsRedeemed}</p>}
 
-      {wallet && <p>Total Available: {itemsAvailable}</p>}
+      {wallet && <p style={{ textAlign: "center"}}>Remaining: {itemsRemaining}</p>}
 
-      {wallet && <p>Redeemed: {itemsRedeemed}</p>}
-
-      {wallet && <p>Remaining: {itemsRemaining}</p>}
-
-      <MintContainer>
-        {!wallet ? (
-          <ConnectButton>Connect Wallet</ConnectButton>
-        ) : (
-          <MintButton
-            disabled={isSoldOut || isMinting || !isActive}
-            onClick={onMint}
-            variant="contained"
-          >
-            {isSoldOut ? (
-              "SOLD OUT"
-            ) : isActive ? (
-              isMinting ? (
-                <CircularProgress />
-              ) : (
-                "MINT"
-              )
-            ) : (
-              <Countdown
-                date={startDate}
-                onMount={({ completed }) => completed && setIsActive(true)}
-                onComplete={() => setIsActive(true)}
-                renderer={renderCounter}
-              />
-            )}
-          </MintButton>
-        )}
-      </MintContainer>
-
+		<div>
+		  <MintContainer>
+			{!wallet ? (
+			  <ConnectButton>Connect Wallet</ConnectButton>
+			) : (
+			 <div style={{ textAlign: "center"}}>
+			  <MintButton
+				disabled={isSoldOut || isMinting || !isActive}
+				onClick={onMint}
+				variant="contained"
+			  >
+				{isSoldOut ? (
+				  "SOLD OUT"
+				) : isActive ? (
+				  isMinting ? (
+					<CircularProgress />
+				  ) : (
+						<div className="display-linebreak">
+						<span style={{ fontSize: 40, fontWeight: "bold", color: 'green'}}>{'MINT'}</span>
+						<p>{'\n'}</p>
+						<span style={{ fontSize: 16, color: 'green'}}>CLICK ME</span>
+						</div>
+				  )
+				) : (
+				  <Countdown
+					date={startDate}
+					onMount={({ completed }) => completed && setIsActive(true)}
+					onComplete={() => setIsActive(true)}
+					renderer={renderCounter}
+				  />
+				)}
+			  </MintButton>
+			  </div>
+			)}
+		  </MintContainer>
+		</div>
+  
+		{wallet && (
+			<div >
+				<p style={{ fontSize: 10, textAlign: "center"}}></p>
+			</div>
+		)}
+  
+  
       <Snackbar
         open={alertState.open}
         autoHideDuration={6000}
@@ -220,6 +253,7 @@ const Home = (props: HomeProps) => {
           {alertState.message}
         </Alert>
       </Snackbar>
+	</div>
     </main>
   );
 };
@@ -237,5 +271,13 @@ const renderCounter = ({ days, hours, minutes, seconds, completed }: any) => {
     </CounterText>
   );
 };
-
+/*
+const renderCounter = ({ days, hours, minutes, seconds }: any) => {
+  return (
+    <span className="text-gray-800 font-bold text-2xl cursor-default">
+      Live in {days} days, {hours} hours, {minutes} minutes, {seconds} seconds
+    </span>
+  );
+};
+*/
 export default Home;
